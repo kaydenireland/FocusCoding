@@ -68,30 +68,43 @@ namespace FocusCoding
 
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += (_, __) => UnblockSites();
             Console.WriteLine("Starting FocusCoding Blocker");
             bool currentlyBlocking = false;
-            while (true)
+
+            try
             {
-                try {
-                    if (!currentlyBlocking && ShouldBlock())
-                    {
-                        currentlyBlocking = true;
-                        Console.WriteLine("IDE Running, Blocking Sites.");
-                        BlockSites();
-                    }
-                    else if (currentlyBlocking && !ShouldBlock())
-                    {
-                        currentlyBlocking = false;
-                        Console.WriteLine("No IDEs Running, Unblocking Sites.");
-                        UnblockSites();
-                    }
-                } 
-                catch(Exception e)
+                while (true)
                 {
-                    Console.WriteLine("Error: " + e.Message);
+                    try
+                    {
+                        if (!currentlyBlocking && ShouldBlock())
+                        {
+                            currentlyBlocking = true;
+                            Console.WriteLine("IDE Running, Blocking Sites.");
+                            BlockSites();
+                        }
+                        else if (currentlyBlocking && !ShouldBlock())
+                        {
+                            currentlyBlocking = false;
+                            Console.WriteLine("No IDEs Running, Unblocking Sites.");
+                            UnblockSites();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error: " + e.Message);
+                    }
+                    Thread.Sleep(15000);    // 15000 = 15 seconds
                 }
-                Thread.Sleep(15000);    // 30000 = 30 seconds
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fatal error: " + ex.Message);
+                UnblockSites();
+            }
+
+            
         }
 
         private static bool IsRunning(string process)
