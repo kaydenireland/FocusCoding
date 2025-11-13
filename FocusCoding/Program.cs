@@ -5,26 +5,65 @@ namespace FocusCoding
     internal class Program
     {
 
-        // Hosts file location
-        private static readonly string hostsPath =
-            @"C:\Windows\System32\drivers\etc\hosts";
+        private static readonly string hostsPath = @"C:\Windows\System32\drivers\etc\hosts";
 
-        // List of sites to block
         private static readonly string[] blockedSites =
         {
         "chatgpt.com",
-        "www.chatgpt.com",
+        "claude.ai",
+        "chat.openai.com",
+        "copilot.microsoft.com",
+        "bard.google.com",
+        "gemini.google.com",
+        "grok.com",
+
         "youtube.com",
-        "www.youtube.com"
+        "twitch.tv",
+
+        "hulu.com",
+        "netflix.com",
+
+        "instagram.com",
+        "tiktok.com",
+        "facebook.com",
+        "x.com",
+        "reddit.com",
+        "snapchat.com",
+        "discord.com"
         };
 
-        // List of processes to check
         private static readonly string[] processes =
         {
-            "Code" // VSCode
+            "Code", // VSCode
+            "devenv", // Visual Studio
+
+            "notepad++",
+            "Brackets",
+            "atom",
+            "studio64",
+            "Xcode",
+
+            "Unity",
+            "UnrealEditor",
+
+            "eclipse",
+            "netbeans",
+            "netbeans64",
+
+            "spyder",
+            "thonny",
+
+            "idea64",
+            "pycharm64",
+            "clion64",
+            "rider64",
+            "webstorm64",
+            "phpstorm64",
+            "rubymine64"
+
         };
 
-        private static readonly string newIP = "127.0.0.1";
+        private static readonly string newIP = "0.0.0.0";
 
 
         static void Main(string[] args)
@@ -81,11 +120,22 @@ namespace FocusCoding
             {
                 string entry = $"{newIP} {site}";
                 if (!content.Contains(entry))
+                {
                     newLines.Add(entry);
+                }
+
+                entry = $"{newIP} www.{site}";
+                if (!content.Contains(entry))
+                {
+                    newLines.Add(entry);
+                }
             }
 
             if (newLines.Count > 0)
+            {
                 File.AppendAllLines(hostsPath, newLines);
+            }
+            FlushDNS();
         }
 
 
@@ -96,6 +146,19 @@ namespace FocusCoding
                 .ToList();
 
             File.WriteAllLines(hostsPath, lines);
+            FlushDNS();
         }
+
+        private static void FlushDNS()
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "ipconfig",
+                Arguments = "/flushdns",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            });
+        }
+
     }
 }
